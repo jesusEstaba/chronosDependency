@@ -13,10 +13,5 @@
         "psr-4": {
             "ChronosDependency\\": "src/"
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-develop": "dev-master"
-        }
     }
 }
