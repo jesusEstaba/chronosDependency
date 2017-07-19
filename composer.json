@@ -1,0 +1,16 @@
+{
+    "name": "jesusestaba/chronosdependency",
+    "description": "",
+    "keywords": [],
+    "license" : "MIT",
+    "authors" : [
+        {
+            "name": "Jesus Estaba",
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ChronosDependency\\": "src/"
+        }
+    }
+}
