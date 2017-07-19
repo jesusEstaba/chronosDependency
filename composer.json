@@ -3,6 +3,7 @@
     "description": "",
     "keywords": [],
     "license" : "MIT",
+    "version": "1.0",
     "authors" : [
         {
             "name": "Jesus Estaba"
@@ -11,6 +12,11 @@
     "autoload": {
         "psr-4": {
             "ChronosDependency\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "dev-master"
         }
     }
 }
