@@ -1,6 +1,6 @@
 <?php
 
-namespace Cronos\Http\Controllers;
+namespace CronosDependency;
 
 use Illuminate\Http\Request;
 use Repo\Partitie;
