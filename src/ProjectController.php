@@ -1,6 +1,6 @@
 <?php
 
-namespace CronosDependency;
+namespace ChronosDependency;
 
 use Illuminate\Http\Request;
 use Repo\Project;
