@@ -166,7 +166,17 @@ trait ProjectController
      */
     public function show($id)
     {
-        $project = Project::where('companieId', Auth::user()->companieId)->find($id);
+        $project = Project::where('companieId', Auth::user()->companieId)
+            ->where(function ($query) {
+                if (Auth::user()->rol == 0) {
+                    $query->where('userId', Auth::user()->id);
+                }
+            })
+            ->find($id);
+
+        if (!$project) {
+            return redirect('/projects');
+        }
 
         $projectModifiers = Modifier::where('projectId', $id)->get();
 
