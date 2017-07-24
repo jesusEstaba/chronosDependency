@@ -31,6 +31,10 @@ trait ProjectController
                 if ($search) {
                     $query->where('name', 'like', '%' . $search . '%');
                 }
+
+                if (Auth::user()->rol == 0) {
+                    $query->where('userId', Auth::user()->id);
+                }
             })
             ->orderBy('id', 'desc')
             ->paginate(10);

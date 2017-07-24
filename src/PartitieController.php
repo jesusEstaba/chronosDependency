@@ -42,7 +42,7 @@ trait PartitieController
     public function create()
     {
         $categories = Category::where('companieId', Auth::user()->companieId)->get();
-        $units = Unit::all();
+        $units = Unit::where('companieId', Auth::user()->companieId)->get();
   
         return view('partitie.create', compact('categories', 'units'));
     }
