@@ -10,6 +10,7 @@ use Repo\ProjectEquipment;
 use Repo\ProjectWorkforce;
 use Repo\Modifier;
 use Repo\Client;
+use Repo\Activity;
 use Auth;
 
 use Cronos\model\Cost;
@@ -117,6 +118,8 @@ trait ProjectController
             ]));
         }
 
+        $order = 0;
+
         if (count($request->partities)) {
             foreach ($request->partities as $partitie) {
                 $partitieId = ProjectPartitie::create([
@@ -125,31 +128,40 @@ trait ProjectController
                     'projectId' => $projectId,
                     'partitieId' => $partitie['id'],
                     'userId' => Auth::user()->id,
+                    'order' => $order++,
+                    'parent' => 0
                 ])->id;
 
-                foreach ($partitie['materials'] as $material) {
-                    ProjectMaterial::create([
-                        'partitieId' => $partitieId,
-                        'materialId' => $material['materialId'],
-                        'costId' => $material['costId'],
-                    ]);
-                }
 
-                foreach ($partitie['equipments'] as $equipment) {
-                    ProjectEquipment::create([
-                        'partitieId' => $partitieId,
-                        'equipmentId' => $equipment['equipmentId'],
-                        'costId' => $equipment['costId'],
-                    ]);
-                }
+                if (isset($partitie['materials'])) {
+	                foreach ($partitie['materials'] as $material) {
+	                    ProjectMaterial::create([
+	                        'partitieId' => $partitieId,
+	                        'materialId' => $material['materialId'],
+	                        'costId' => $material['costId'],
+	                    ]);
+	                }
+            	}
 
-                foreach ($partitie['workforces'] as $workforce) {
-                    ProjectWorkforce::create([
-                        'partitieId' => $partitieId,
-                        'workforceId' => $workforce['workforceId'],
-                        'costId' => $workforce['costId'],
-                    ]);
-                }
+                if (isset($partitie['equipments'])) {
+                	foreach ($partitie['equipments'] as $equipment) {
+	                    ProjectEquipment::create([
+	                        'partitieId' => $partitieId,
+	                        'equipmentId' => $equipment['equipmentId'],
+	                        'costId' => $equipment['costId'],
+	                    ]);
+	                }
+            	}
+
+                if (isset($partitie['workforces'])) {
+	                foreach ($partitie['workforces'] as $workforce) {
+	                    ProjectWorkforce::create([
+	                        'partitieId' => $partitieId,
+	                        'workforceId' => $workforce['workforceId'],
+	                        'costId' => $workforce['costId'],
+	                    ]);
+	                }
+            	}
             }
         }
 
@@ -205,7 +217,7 @@ trait ProjectController
 
         $calculator = new CostPartitie($modifiers);
         
-        $pdf = \PDF::loadView('pdf.partitie', compact('project', 'calculator'));
+        $pdf = \PDF::loadView('project.pdf', compact('project', 'calculator'));
         
         return $pdf->stream();
     }
@@ -243,4 +255,54 @@ trait ProjectController
     {
         //
     }
+
+    public function gantt($id)
+    {
+    	$project = Project::where('companieId', Auth::user()->companieId)->find($id);
+
+    	$projectPartities = $project->partities();
+
+    	foreach ($projectPartities as $partitie) {
+    		if(is_null($partitie->activity())) {
+    			Activity::create([
+    				'partitieId' => $partitie->id,
+    				'start' => $project->start,
+    				'end' => $project->start,
+    				'finish' => $project->start,
+    				'stateId' => 1
+    			]);
+    		}
+    	}
+
+    	return view('project.gantt', compact('project', 'projectPartities'));
+    }
+
+    public function saveGantt(Request $request) {
+
+    	foreach ($request->partities as $partitie) {
+			//echo $this->jsTime($partitie[2]) . '<br>';
+			
+			Activity::where('partitieId', $partitie[0])
+				->update([
+					'start' => $this->jsTime($partitie[2]),
+				]);
+
+
+			ProjectPartitie::where('id', $partitie[0])
+				->update([
+					'parent' => !is_null($partitie[6]) ? $partitie[6] : 0,
+				]);
+			
+    	}
+
+    	return response()->json(['status' => 'success']);
+    }
+
+    private function jsTime($time)
+    {
+		$time = substr($time, 0, strpos($time, '('));
+
+    	return date('Y-m-d', strtotime($time));
+    }
 }
+

@@ -5,7 +5,8 @@ namespace ChronosDependency;
 use Illuminate\Http\Request;
 use Repo\User;
 use Auth;
-trait UserController
+
+trait UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -48,10 +49,14 @@ trait UserController
     {
         User::create([
             'name' => $request->name,
-            'rif' => $request->rif ?? '',
-            'address' => $request->address ?? '',
-            'phone' => $request->phone ?? '',
-            'companieId' => Auth::user()->companieId,
+	        'email' => $request->email, 
+	        'password' => bcrypt($request->password), 
+	        'companieId' => Auth::user()->companieId,
+	        'rol' => $request->rol,
+	        'state' => $request->state,
+	        'identificator' => $request->rif ?? '',
+	        'phone' => $request->phone ?? '',
+	        'address' => $request->address ?? '',
         ]);
 
         session()->flash('success', 'Usuario Creado.');

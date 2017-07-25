@@ -43,8 +43,13 @@ trait PartitieController
     {
         $categories = Category::where('companieId', Auth::user()->companieId)->get();
         $units = Unit::where('companieId', Auth::user()->companieId)->get();
-  
-        return view('partitie.create', compact('categories', 'units'));
+  		$partities = Partitie::where('companieId', Auth::user()->companieId)->get();
+
+        return view('partitie.create', compact(
+        	'categories', 
+        	'units',
+        	'partities'
+        ));
     }
 
     /**
@@ -61,33 +66,41 @@ trait PartitieController
             'companieId' => Auth::user()->companieId,
             'unitId' => $request->unit,
             'userId' => Auth::user()->id,
+            'reference' => $request->reference,
+            'parent' => $request->parent,
         ])->id;
 
-        foreach ($request->materials as $material) {
-            PartitieMaterial::create([
-                'partitieId' => $partitieId,
-                'materialId' => $material['id'],
-                'quantity' => $material['qty'],
-                'uniq' => ($material['uniq']=="on") ? 1 : 0,
-            ]);
+        if (count($request->materials)) {
+        	foreach ($request->materials as $material) {
+	            PartitieMaterial::create([
+	                'partitieId' => $partitieId,
+	                'materialId' => $material['id'],
+	                'quantity' => $material['qty'],
+	                'uniq' => ($material['uniq']=="on") ? 1 : 0,
+	            ]);
+	        }
         }
 
-        foreach ($request->equipments as $equipment) {
-            PartitieEquipment::create([
-                'partitieId' => $partitieId,
-                'equipmentId' => $equipment['id'],
-                'quantity' => $equipment['qty'],
-                'uniq' => ($equipment['uniq']=="on") ? 1 : 0,
-                'workers' => ($equipment['workers']=="on") ? 1 : 0,
-            ]);
+        if (count($request->equipments)) {
+        	foreach ($request->equipments as $equipment) {
+	            PartitieEquipment::create([
+	                'partitieId' => $partitieId,
+	                'equipmentId' => $equipment['id'],
+	                'quantity' => $equipment['qty'],
+	                'uniq' => ($equipment['uniq']=="on") ? 1 : 0,
+	                'workers' => ($equipment['workers']=="on") ? 1 : 0,
+	            ]);
+	        }
         }
 
-        foreach ($request->workforces as $workforce) {
-            PartitieWorkforce::create([
-                'partitieId' => $partitieId,
-                'workforceId' => $workforce['id'],
-                'quantity' => $workforce['qty'],
-            ]);
+        if (count($request->workforces)) {
+        	foreach ($request->workforces as $workforce) {
+	            PartitieWorkforce::create([
+	                'partitieId' => $partitieId,
+	                'workforceId' => $workforce['id'],
+	                'quantity' => $workforce['qty'],
+	            ]);
+	        }
         }
 
         return response()->json(["redirect" => true]);

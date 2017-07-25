@@ -98,6 +98,9 @@ trait SearchController
         $partitie = Partitie::where('companieId', Auth::user()->companieId)
             ->find($request->id);
 
+        $partitie->childs = Partitie::where('parent', $partitie->id)
+            ->get();
+
         $partitie->materials = $partitie->materials()->get();
         
         foreach ($partitie->materials as $material) {
