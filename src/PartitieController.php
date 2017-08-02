@@ -14,6 +14,7 @@ use Auth;
 trait PartitieController
 {
     /**
+     * 
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
