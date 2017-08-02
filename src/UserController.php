@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Repo\User;
 use Auth;
 
-trait UserController extends Controller
+trait UserController
 {
     /**
      * Display a listing of the resource.
